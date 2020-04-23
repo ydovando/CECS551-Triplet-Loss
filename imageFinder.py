@@ -6,3 +6,19 @@
 #output: images of group members
 
 
+# get group id 
+
+
+def getImagesForGroup(x):
+        
+        # find the images of the group based on the first character of the file name
+
+
+
+        # using YOLO face detection algorithm save the one with the highest pc
+
+
+        # save name of image with highest pc for that group member
+
+
+
