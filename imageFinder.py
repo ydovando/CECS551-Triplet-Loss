@@ -8,17 +8,33 @@
 
 # get group id 
 
+from os import walk
+import os
+
+
+from os import walk
+import os
+
+from keras_yolo_model import _main_
+# from image2vec import calc_embs
+
+
+
+photo_dirs = os.getcwd()+"/photos"
+weights_path = os.getcwd() +"/yolov3.weights"
 
 def getImagesForGroup(x):
+        group_in_query = x
+        converted_int = str(group_in_query)
+
+        for dir in os.listdir(os.getcwd()+"/photos"):
         
-        # find the images of the group based on the first character of the file name
+                if dir[0] == converted_int:
+                        person_dir = photo_dirs+"/"+dir
+                        top_person_pc = _main_(weights_path, person_dir)
+                        print(top_person_pc)
+                        # call to image to vec
 
-
-
-        # using YOLO face detection algorithm save the one with the highest pc
-
-
-        # save name of image with highest pc for that group member
 
 
 
