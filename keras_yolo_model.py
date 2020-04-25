@@ -383,8 +383,9 @@ def draw_boxes(image, boxes, labels, obj_thresh):
  
     return (image, person_prediction)    
 
-def _main_(weights, person_dir):
+def _main_(photo_dirs, weights, group_in_query):
     weights_path = weights
+    
     # set some parameters
     net_h, net_w = 416, 416
     obj_thresh, nms_thresh = 0.9, 0.45
@@ -408,41 +409,49 @@ def _main_(weights, person_dir):
     weight_reader.load_weights(yolov3)
 
     # preprocess the image in the directory 
-    max_pc =0
-    best_image_path=""
+  
     top_people_pc= []
-    for photo in os.listdir(person_dir):   
-        image_path = person_dir+"/"+photo
-        image = cv2.imread(image_path)
-        image_h, image_w, _ = image.shape
-        new_image = preprocess_input(image, net_h, net_w)
+    for dir in os.listdir(photo_dirs):
+        if dir[0] == group_in_query:
+            max_pc =0
+            best_image_path=""
+            person_dir = photo_dirs+"/"+dir
+            print("PERSON: ", person_dir)
+            for photo in os.listdir(person_dir):   
+                image_path = person_dir+"/"+photo
+                image = cv2.imread(image_path)
+                image_h, image_w, _ = image.shape
+                new_image = preprocess_input(image, net_h, net_w)
 
-        # run the prediction
-        yolos = yolov3.predict(new_image)
-        boxes = []
+                # run the prediction
+                yolos = yolov3.predict(new_image)
+                boxes = []
 
-        for i in range(len(yolos)):
-            # decode the output of the network
-            boxes += decode_netout(yolos[i][0], anchors[i], obj_thresh, nms_thresh, net_h, net_w)
+                for i in range(len(yolos)):
+                    # decode the output of the network
+                    boxes += decode_netout(yolos[i][0], anchors[i], obj_thresh, nms_thresh, net_h, net_w)
 
-        # correct the sizes of the bounding boxes
-        correct_yolo_boxes(boxes, image_h, image_w, net_h, net_w)
+                # correct the sizes of the bounding boxes
+                correct_yolo_boxes(boxes, image_h, image_w, net_h, net_w)
 
-        # suppress non-maximal boxes
-        do_nms(boxes, nms_thresh)     
+                # suppress non-maximal boxes
+                do_nms(boxes, nms_thresh)     
 
-        # draw bounding boxes on the image using labels
-        image, person_prediction = draw_boxes(image, boxes, labels, obj_thresh) 
-        if person_prediction > max_pc:
-            max_pc = person_prediction
-            best_image_path = image_path
-       
+                # draw bounding boxes on the image using labels
+                image, person_prediction = draw_boxes(image, boxes, labels, obj_thresh) 
+                if person_prediction > max_pc:
+                    max_pc = person_prediction
+                    best_image_path = image_path
+            print("best------" , max_pc, " ", best_image_path)
+            top_people_pc.append((max_pc, best_image_path))
+        
+
 
  
     # # write the image with bounding boxes to file
     # output_path = os.getcwd()+"/outputs/"
     # cv2.imwrite(output_path+ '_detected' + image_path[-4:], (image).astype('uint8')) 
-    return (max_pc, best_image_path)
+    return top_people_pc
 
 # if __name__ == '__main__':
 #     args = argparser.parse_args()

@@ -24,16 +24,10 @@ photo_dirs = os.getcwd()+"/photos"
 weights_path = os.getcwd() +"/yolov3.weights"
 
 def getImagesForGroup(x):
-        group_in_query = x
-        converted_int = str(group_in_query)
+        group_in_query = str(x)
+        result = _main_(photo_dirs, weights_path, group_in_query)
+        print("BEST PC IMAGES FOR GROUP: " , result)
 
-        for dir in os.listdir(os.getcwd()+"/photos"):
-        
-                if dir[0] == converted_int:
-                        person_dir = photo_dirs+"/"+dir
-                        top_person_pc = _main_(weights_path, person_dir)
-                        print(top_person_pc)
-                        # call to image to vec
 
 
 
