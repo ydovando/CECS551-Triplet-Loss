@@ -8,7 +8,6 @@ import numpy as np
 import os
 import matplotlib.pyplot as plt
 import cv2
-import keras
 from sklearn.decomposition import PCA
 from mpl_toolkits.mplot3d import Axes3D
 from mpl_toolkits.mplot3d import proj3d
@@ -16,25 +15,8 @@ from imageio import imread
 from skimage.transform import resize
 from scipy.spatial import distance
 from keras.models import load_model
+import csv
 
-photo = str(sys.argv[1])
-head_tail = os.path.split(photo)
-cascade_path = os.getcwd()+"/model/cv2/haarcascade_frontalface_alt2.xml"
-image_dir_basepath = './photos/'
-names = [head_tail[0]]
-image_size = 160
-
-i = 0
-image_index = 0
-for x in os.listdir(os.path.join(image_dir_basepath, names[0])):
-    if x == head_tail[1]:
-        image_index = i
-        break
-    i += 1
-
-model_weights_path = os.getcwd() +"/model/keras/model/facenet_keras.h5"
-print(model_weights_path)
-model = load_model(model_weights_path)
 
 
 def prewhiten(x):
@@ -62,6 +44,8 @@ def load_and_align_images(filepaths, margin):
     
     aligned_images = []
     for filepath in filepaths:
+
+        print(filepath)
         img = imread(filepath)
 
         faces = cascade.detectMultiScale(img,
@@ -76,12 +60,12 @@ def load_and_align_images(filepaths, margin):
     return np.array(aligned_images)
 
 def calc_embs(filepaths, margin=10, batch_size=1):
+    
     aligned_images = prewhiten(load_and_align_images(filepaths, margin))
     pd = []
     for start in range(0, len(aligned_images), batch_size):
         pd.append(model.predict_on_batch(aligned_images[start:start+batch_size]))
     embs = l2_normalize(np.concatenate(pd))
-
     return embs
 
 def calc_dist(img_name0, img_name1):
@@ -94,13 +78,82 @@ def calc_dist_plot(img_name0, img_name1):
     plt.subplot(1, 2, 2)
     plt.imshow(imread(data[img_name1]['image_filepath']))
 
+def export_embedded_vector():
+
+    f = open("vectors.txt", "w")
+    all_embedded_vectors_dict = {}
+    file_names = []
+    count = 0
+    print("export start")
+    image = os.getcwd() + image_dir_basepath
+    for x in os.listdir(image):
+        export_data = {}
+        export_names = [x]
+        print(export_names)
+        for name in export_names:
+            print(name)
+            # image_dirpath = os.path.join(image_dir_basepath, x)
+            image_dirpath = image_dir_basepath + x
+            image_filepaths = [os.path.join(image_dirpath, f) for f in os.listdir(image_dirpath)]
+            embs = calc_embs(image_filepaths)
+            for i in range(len(image_filepaths)):
+                # print(image_filepaths[i])
+                export_data['{}{}'.format(name, i)] = {'image_filepath' : image_filepaths[i],
+                                                'emb' : embs[i]}
+                file_names.append(image_filepaths[i])
+        X = []
+        for v in export_data.values():
+            X.append(v['emb'])
+        pca = PCA(n_components=3).fit(X)
+
+        X_Me = []
+        print("xme:" + x)
+        # print (export_data.items())
+        for k, v in export_data.items():
+            print("k: " + k)
+            if x in k:
+                X_Me.append(v['emb'])
+        
+        Xd_Me = pca.transform(X_Me)
+        img_count = 0
+        for i in Xd_Me:
+            print(str(file_names[count]), " ", img_count, " ", Xd_Me[img_count,:]/Xd_Me[img_count,:].sum(axis=0,keepdims=1))
+            all_embedded_vectors_dict.update({str(file_names[count]): Xd_Me[img_count,:]/Xd_Me[img_count,:].sum(axis=0,keepdims=1)})
+            f.write(str(file_names[count]))
+            f.write(" ")
+            f.write(str(Xd_Me[img_count,:]/Xd_Me[img_count,:].sum(axis=0,keepdims=1)))
+            f.write("\n")
+            img_count += 1
+            count += 1
+    f.close()
+
+photo = str(sys.argv[1])
+head_tail = os.path.split(photo)
+cascade_path = './model/cv2/haarcascade_frontalface_alt2.xml'
+
+image_dir_basepath = './photos/'
+names = [head_tail[0]]
+image_size = 160
+
+i = 0
+image_index = 0
+for x in os.listdir(os.path.join(image_dir_basepath, names[0])):
+    if x == head_tail[1]:
+        image_index = i
+        break
+    i += 1
+
+model_path = './model/keras/model/facenet_keras.h5'
+model = load_model(model_path)
+
 data = {}
+print(names)
 for name in names:
+    print(name)
     image_dirpath = image_dir_basepath + name
     image_filepaths = [os.path.join(image_dirpath, f) for f in os.listdir(image_dirpath)]
     embs = calc_embs(image_filepaths)
     for i in range(len(image_filepaths)):
-        # print(image_filepaths[i])
         data['{}{}'.format(name, i)] = {'image_filepath' : image_filepaths[i],
                                         'emb' : embs[i]}
 
@@ -113,10 +166,10 @@ pca = PCA(n_components=3).fit(X)
 
 X_Me = []
 for k, v in data.items():
+    print("k: " + k)
     if head_tail[0] in k:
+        print("got here 1")
         X_Me.append(v['emb'])
-    # elif 'x' in k:
-    #     X_x.append(v['emb'])
         
 Xd_Me = pca.transform(X_Me)
 
@@ -132,4 +185,5 @@ print(nev.sum())
 plt.title('Embedding Vector')
 ax.legend(loc='upper right')
 
+# export_embedded_vector()
 # plt.show()
