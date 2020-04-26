@@ -40,6 +40,7 @@ def l2_normalize(x, axis=-1, epsilon=1e-10):
     return output
 
 def load_and_align_images(filepaths, margin):
+    cascade_path = './model/cv2/haarcascade_frontalface_alt2.xml'
     cascade = cv2.CascadeClassifier(cascade_path)
     
     aligned_images = []
@@ -54,13 +55,14 @@ def load_and_align_images(filepaths, margin):
         (x, y, w, h) = faces[0]
         cropped = img[y-margin//2:y+h+margin//2,
                       x-margin//2:x+w+margin//2, :]
-        aligned = resize(cropped, (image_size, image_size), mode='reflect')
+        aligned = resize(cropped, (160, 160), mode='reflect')
         aligned_images.append(aligned)
             
     return np.array(aligned_images)
 
 def calc_embs(filepaths, margin=10, batch_size=1):
-    
+    model_path = './model/keras/model/facenet_keras.h5'
+    model = load_model(model_path)
     aligned_images = prewhiten(load_and_align_images(filepaths, margin))
     pd = []
     for start in range(0, len(aligned_images), batch_size):
@@ -127,63 +129,62 @@ def export_embedded_vector():
             count += 1
     f.close()
 
-photo = str(sys.argv[1])
-head_tail = os.path.split(photo)
-cascade_path = './model/cv2/haarcascade_frontalface_alt2.xml'
+# photo = str(sys.argv[1])
+# head_tail = os.path.split(photo)
+# cascade_path = './model/cv2/haarcascade_frontalface_alt2.xml'
 
-image_dir_basepath = './photos/'
-names = [head_tail[0]]
-image_size = 160
+# image_dir_basepath = './photos/'
+# names = [head_tail[0]]
+# image_size = 160
 
-i = 0
-image_index = 0
-for x in os.listdir(os.path.join(image_dir_basepath, names[0])):
-    if x == head_tail[1]:
-        image_index = i
-        break
-    i += 1
+# i = 0
+# image_index = 0
+# for x in os.listdir(os.path.join(image_dir_basepath, names[0])):
+#     if x == head_tail[1]:
+#         image_index = i
+#         break
+#     i += 1
 
-model_path = './model/keras/model/facenet_keras.h5'
-model = load_model(model_path)
 
-data = {}
-print(names)
-for name in names:
-    print(name)
-    image_dirpath = image_dir_basepath + name
-    image_filepaths = [os.path.join(image_dirpath, f) for f in os.listdir(image_dirpath)]
-    embs = calc_embs(image_filepaths)
-    for i in range(len(image_filepaths)):
-        data['{}{}'.format(name, i)] = {'image_filepath' : image_filepaths[i],
-                                        'emb' : embs[i]}
 
-# calc_dist_plot('4-Matthew-Nguyen0', '4-Matthew-Nguyen1')
+# data = {}
+# print(names)
+# for name in names:
+#     print(name)
+#     image_dirpath = image_dir_basepath + name
+#     image_filepaths = [os.path.join(image_dirpath, f) for f in os.listdir(image_dirpath)]
+#     embs = calc_embs(image_filepaths)
+#     for i in range(len(image_filepaths)):
+#         data['{}{}'.format(name, i)] = {'image_filepath' : image_filepaths[i],
+#                                         'emb' : embs[i]}
 
-X = []
-for v in data.values():
-    X.append(v['emb'])
-pca = PCA(n_components=3).fit(X)
+# # calc_dist_plot('4-Matthew-Nguyen0', '4-Matthew-Nguyen1')
 
-X_Me = []
-for k, v in data.items():
-    print("k: " + k)
-    if head_tail[0] in k:
-        print("got here 1")
-        X_Me.append(v['emb'])
+# X = []
+# for v in data.values():
+#     X.append(v['emb'])
+# pca = PCA(n_components=3).fit(X)
+
+# X_Me = []
+# for k, v in data.items():
+#     print("k: " + k)
+#     if head_tail[0] in k:
+#         print("got here 1")
+#         X_Me.append(v['emb'])
         
-Xd_Me = pca.transform(X_Me)
+# Xd_Me = pca.transform(X_Me)
 
-fig = plt.figure(figsize=(8,8))
-ax = fig.add_subplot(111, projection='3d')
-plt.rcParams['legend.fontsize'] = 10   
-# ax.plot(Xd_Me[0, 0], Xd_Me[0, 1], Xd_Me[0, 2],
-#         'o', markersize=8, color='purple', alpha=0.5, label='Me')
-print()
-nev = Xd_Me[image_index,:]/Xd_Me[image_index,:].sum(axis=0,keepdims=1)
-print(nev)
-print(nev.sum())
-plt.title('Embedding Vector')
-ax.legend(loc='upper right')
+# fig = plt.figure(figsize=(8,8))
+# ax = fig.add_subplot(111, projection='3d')
+# plt.rcParams['legend.fontsize'] = 10   
+# # ax.plot(Xd_Me[0, 0], Xd_Me[0, 1], Xd_Me[0, 2],
+# #         'o', markersize=8, color='purple', alpha=0.5, label='Me')
+# print()
+# nev = Xd_Me[image_index,:]/Xd_Me[image_index,:].sum(axis=0,keepdims=1)
+# print(nev)
+# print(nev.sum())
+# plt.title('Embedding Vector')
+# ax.legend(loc='upper right')
 
-# export_embedded_vector()
-# plt.show()
+# # export_embedded_vector()
+# # plt.show()

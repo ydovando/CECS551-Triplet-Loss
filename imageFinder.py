@@ -7,16 +7,18 @@
 
 
 # get group id 
-
 from os import walk
 import os
-
-
-from os import walk
-import os
+from sklearn.decomposition import PCA
+from mpl_toolkits.mplot3d import Axes3D
+from mpl_toolkits.mplot3d import proj3d
+from imageio import imread
+from skimage.transform import resize
+from scipy.spatial import distance
+from keras.models import load_model
 
 from keras_yolo_model import _main_
-# from image2vec import calc_embs
+import image2vec 
 
 
 
@@ -25,10 +27,51 @@ weights_path = os.getcwd() +"/yolov3.weights"
 
 def getImagesForGroup(x):
         group_in_query = str(x)
-        result = _main_(photo_dirs, weights_path, group_in_query)
-        print("BEST PC IMAGES FOR GROUP: " , result)
+        # result = _main_(photo_dirs, weights_path, group_in_query)
+        f = open("vectors.txt", "w")
+        all_embedded_vectors_dict = {}
+        file_names = []
+        count = 0
+        for dir in os.listdir(photo_dirs):
 
+                data = {}
 
+                image_dirpath = photo_dirs+"/"+dir
+                image_filepaths = [os.path.join(image_dirpath, f)
+                                for f in os.listdir(image_dirpath)]
+                embs = image2vec.calc_embs(image_filepaths)
+                for i in range(len(image_filepaths)):
+                        data['{}{}'.format(dir, i)] = {'image_filepath': image_filepaths[i],
+                                                        'emb': embs[i]}
+                        file_names.append(image_filepaths[i])
 
+                X = []
+                for v in data.values():
+                        X.append(v['emb'])
+                pca = PCA(n_components=3).fit(X)
+
+                X_Me = []
+                print("xme: ", dir)
+                for k, v in data.items():
+                        print("k: ", k)
+                        if dir in k:
+                                X_Me.append(v['emb'])
+
+                Xd_Me = pca.transform(X_Me)
+
+                img_count = 0
+                for i in Xd_Me:
+                        print(str(file_names[count]), " ", img_count, " ",
+                                Xd_Me[img_count, :]/Xd_Me[img_count, :].sum(axis=0, keepdims=1))
+                        all_embedded_vectors_dict.update(
+                                {str(file_names[count]): Xd_Me[img_count, :]/Xd_Me[img_count, :].sum(axis=0, keepdims=1)})
+                        f.write(str(file_names[count]))
+                        f.write(" ")
+                        f.write(str(Xd_Me[img_count, :] /
+                                        Xd_Me[img_count, :].sum(axis=0, keepdims=1)))
+                        f.write("\n")
+                        img_count += 1
+                        count += 1
+        f.close()
 
 
