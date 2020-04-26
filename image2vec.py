@@ -8,6 +8,7 @@ import numpy as np
 import os
 import matplotlib.pyplot as plt
 import cv2
+import keras
 from sklearn.decomposition import PCA
 from mpl_toolkits.mplot3d import Axes3D
 from mpl_toolkits.mplot3d import proj3d
@@ -18,8 +19,8 @@ from keras.models import load_model
 
 photo = str(sys.argv[1])
 head_tail = os.path.split(photo)
-cascade_path = './model/cv2/haarcascade_frontalface_alt2.xml'
-
+cascade_path = os.getcwd()+"/model/cv2/haarcascade_frontalface_alt2.xml"
+print(cascade_path)
 image_dir_basepath = './photos/'
 names = [head_tail[0]]
 image_size = 160
@@ -32,8 +33,10 @@ for x in os.listdir(os.path.join(image_dir_basepath, names[0])):
         break
     i += 1
 
-model_path = './model/keras/model/facenet_keras.h5'
-model = load_model(model_path)
+model_weights_path = os.getcwd() +"/model/keras/model/facenet_keras.h5"
+print(model_weights_path)
+model = load_model(model_weights_path)
+
 
 def prewhiten(x):
     if x.ndim == 4:
