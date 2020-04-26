@@ -20,7 +20,6 @@ from keras.models import load_model
 photo = str(sys.argv[1])
 head_tail = os.path.split(photo)
 cascade_path = os.getcwd()+"/model/cv2/haarcascade_frontalface_alt2.xml"
-print(cascade_path)
 image_dir_basepath = './photos/'
 names = [head_tail[0]]
 image_size = 160
