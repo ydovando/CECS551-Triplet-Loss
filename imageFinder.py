@@ -45,8 +45,6 @@ def getImagesForGroup(x , dist_thresh=0.5):
                 file_names = []
                 count = 0
 
-
-
                 for dir in os.listdir(photo_dirs):
 
                         data = {}
@@ -88,7 +86,6 @@ def getImagesForGroup(x , dist_thresh=0.5):
                                 img_count += 1
                                 count += 1
 
-                
                 f.close()
         # ---------------------------- [GETTING ALL PICS SIMILAR TO THE GROUP MEMBERS] ---------------------------------------
  
@@ -99,19 +96,23 @@ def getImagesForGroup(x , dist_thresh=0.5):
                 df = pd.DataFrame.from_dict(all_embedded_vectors_dict , orient= 'index' , columns = ['x','y','z'])
                 for item in result:
                         # get the image path 
-                        top_pc_image_path = item[2]
+                        top_pc_image_path = item[1]
+                        print(top_pc_image_path)
                         #get the embedded vector associated with that image
-                        vec_top_pc = df[top_pc_image_path]
+                        vec_top_pc = np.array(df.loc[top_pc_image_path][-3:])
+                        print("Top pc array: " , vec_top_pc)
 
                         counter = 0
-                        for row in data.iterrows():
-                                image_path = df.iloc[counter][0]
-                                if top_pc_image_path != image_path:
-                                        vec_compare = np.array(df.iloc[counter][-3:])
-                                        distance = image2vec.calc_dist_using_vecs(vec_top_pc, vec_compare)
-                                        if distance < dist_thresh:
-                                                similar_pics.append(image_path , distance)
-                                counter +=1
+                        for dir in os.listdir(photo_dirs):
+                                image_dirpath = photo_dirs+"/"+dir
+                                for img in os.listdir(image_dirpath):
+                                        image_filepath = os.path.join(image_dirpath, img)
+
+                                        if top_pc_image_path != image_filepath:
+                                                vec_compare= np.array(df.loc[image_filepath][-3:])
+                                                distance = image2vec.calc_dist_using_vecs(vec_top_pc, vec_compare)
+                                                if distance < dist_thresh:
+                                                        similar_pics.append((image_filepath, distance))  
                 df.to_csv(os.getcwd()+"/embed-vecs.csv")
                 return similar_pics
 
