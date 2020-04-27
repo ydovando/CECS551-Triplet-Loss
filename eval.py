@@ -6,13 +6,18 @@ import os
 class Eval:
 
     def __init__(self, similar_pics, group_id):
-        self.precision= 0
-        self.recall = 0
+        self.prec= 0
+        self.rec = 0
         self.similar_pics = similar_pics
         self.group_id = group_id
-        self.num_correct_imgs= self.correct_images()
+
+        self.num_correct_imgs= 0
+        self.correct_images()
+
         self.recognized_images = len(similar_pics)
-        self.act_imgs = self.recall_denom
+
+        self.act_imgs = 0
+        self.recall_denom()
 
     def evaluation(self, similar_pics, group_id):
         print(similar_pics)
@@ -22,11 +27,16 @@ class Eval:
         photo_dir = os.getcwd()+"/photos"
         correct = 0
         for item in self.similar_pics:
+            print("Item " , item)
             # first item in tuple (image path, distance)
             image_file_path = item[0]
-            # first character in image path
-            group_num = image_file_path[0]
 
+            print("Image file path ", image_file_path)
+            # first character in image path
+            split_path = image_file_path.split('/')
+            print(split_path[6])
+            direct = split_path[6]
+            group_num = direct[0]
             # if the group ids match then it is counted as correct
             if group_num == str(self.group_id):
                 correct+=1
@@ -48,13 +58,16 @@ class Eval:
 
     # number of correctly recognized images /  number of recognized images
     def precision(self):
-        self.precision =self.num_correct_imgs * 100 / self.recognized_images
-        return self.precision
+        print(self.num_correct_imgs)
+        print(self.recognized_images)
+        self.prec = (self.num_correct_imgs * 100 )/ self.recognized_images
+        return self.prec
     
     # number of correctly recognized images /  number of actual images in the group
     def recall(self):
-        self.recall =self.num_correct_imgs * 100 / self.act_imgs
-        return self.recall
+        print(self.act_imgs)
+        self.rec =(self.num_correct_imgs * 100 )/ self.act_imgs
+        return self.rec
 
 
 

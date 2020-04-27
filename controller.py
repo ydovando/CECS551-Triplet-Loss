@@ -2,50 +2,71 @@
 import imageFinder
 import eval
 
-# get all the images that match for a group with default threshold of 0.5
-# for i in range(7):
-#     group_id = i+1
-#     similar_pics = imageFinder.getImagesForGroup(group_id)
-#     eval.avg_precision_recal(similar_pics , group_id)
 
-
-group_id = 1
-similar_pics = imageFinder.getImagesForGroup(group_id)
-evaluation = eval.Eval(similar_pics, group_id)
-precision = evaluation.precision
-recall = evaluation.recall
-
-print(precision)
-print(recall)
-
-
-
-no_queries = 3
 meanAP =0
 
 
+# query 1  threshold = 0.5 for all groups
+print( "QUERY 1: -----------------------------------------------------------")
+print("Threshold 0.5")
+print()
+precision_sum = 0
+for i in range(7):
+    group_id = i+1 
+    similar_pics = imageFinder.getImagesForGroup(group_id)
+    evaluation = eval.Eval(similar_pics, group_id)
+    precision = evaluation.precision()
+    print("Precision for query 1 and group id ", group_id, " ", precision)
+    precision_sum += precision
+    recall = evaluation.recall()
+    print("Recall for query 1 and group id ", groupid , " " , recall)
+meanAP += (precision_sum / 7)
 
-# # query 1  threshould = 0.5 for all groups
-# precision_sum = 0
-# for i in range(7):
-#     group_id = i+1 
-#     similar_pics = imageFinder.getImagesForGroup(group_id)
-#     evaluation = eval.Eval(similar_pics, group_id)
-#     precision_sum += evaluation.precision()
-#     recall = evaluation.recall()
-#     print("Recall for query 1 and group id ", groupid , " " , recall)
-    
-# evalutaiton_1 = eva.Eval(simila)
+print( "--------------------------------------------------------------")
 
 
+#query 2 threshold = 0.4 for all groups
+print( "QUERY 2: -----------------------------------------------------------")
+print("Threshold 0.4")
+print()
+precision_sum = 0
 
-
-#query 2 threshold = 04 for all groups
-
+for i in range(7):
+    group_id = i+1 
+    similar_pics = imageFinder.getImagesForGroup(group_id , 0.4)
+    evaluation = eval.Eval(similar_pics, group_id)
+    precision = evaluation.precision()
+    print("Precision for query 2 and group id ", group_id, " ", precision)
+    precision_sum += precision
+    recall = evaluation.recall()
+    print("Recall for query 2 and group id ", groupid , " " , recall)
+meanAP += (precision_sum / 7)
+print( "--------------------------------------------------------------")
 
 
 
 # query 3 threshold = 0.3 for all group 
+print( "QUERY 3: -----------------------------------------------------------")
+print("Threshold 0.3")
+Print()
 
+precision_sum = 0
+for i in range(7):
+    group_id = i+1 
+    similar_pics = imageFinder.getImagesForGroup(group_id , 0.3)
+    evaluation = eval.Eval(similar_pics, group_id)
 
+    precision = evaluation.precision()
+    print("Precision for query 3 and group id ", group_id, " ", precision)
+    precision_sum += precision
+
+    recall = evaluation.recall()
+    print("Recall for query 3 and group id ", groupid , " " , recall)
+meanAP += (precision_sum / 7)
+
+print( "--------------------------------------------------------------")
+print()
+print()
+meanAP = meanAP / 3
+print("Mean Average Precision: " , meanAP)
 
