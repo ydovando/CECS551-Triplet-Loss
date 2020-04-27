@@ -6,13 +6,13 @@ import os
 class Eval:
 
     def __init__(self, similar_pics, group_id):
-        self.precision= []
-        self.recall = []
+        self.precision= 0
+        self.recall = 0
         self.similar_pics = similar_pics
         self.group_id = group_id
         self.num_correct_imgs= self.correct_images()
         self.recognized_images = len(similar_pics)
-        self.act_imgs = recall_denom()
+        self.act_imgs = self.recall_denom
 
     def evaluation(self, similar_pics, group_id):
         print(similar_pics)
@@ -30,7 +30,7 @@ class Eval:
             # if the group ids match then it is counted as correct
             if group_num == str(self.group_id):
                 correct+=1
-        self.num_correct += correct
+        self.num_correct_imgs = correct
     
 
     def recall_denom(self):
@@ -47,12 +47,14 @@ class Eval:
 
 
     # number of correctly recognized images /  number of recognized images
-    def precision():
-        self.num_correct_imgs / self.recognized_images
+    def precision(self):
+        self.precision =self.num_correct_imgs * 100 / self.recognized_images
+        return self.precision
     
     # number of correctly recognized images /  number of actual images in the group
-    def recall():
-        self.num_correct_imgs / self.act_imgs
+    def recall(self):
+        self.recall =self.num_correct_imgs * 100 / self.act_imgs
+        return self.recall
 
 
 
