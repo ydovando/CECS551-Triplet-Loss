@@ -73,8 +73,11 @@ def calc_embs(filepaths, margin=10, batch_size=1):
 def calc_dist(img_name0, img_name1):
     return distance.euclidean(data[img_name0]['emb'], data[img_name1]['emb'])
 
+def calc_dist_using_vecs(vec_top_pc, vec_compare):
+    return distance.euclidean(vec_top_pc, vec_compare)
+
 def calc_dist_plot(img_name0, img_name1):
-    print(calc_dist(img_name0, img_name1))
+    print(calc_dist_using(img_name0, img_name1))
     plt.subplot(1, 2, 1)
     plt.imshow(imread(data[img_name0]['image_filepath']))
     plt.subplot(1, 2, 2)

@@ -418,7 +418,9 @@ def _main_(photo_dirs, weights, group_in_query):
             person_dir = photo_dirs+"/"+dir
             print("PERSON: ", person_dir)
             for photo in os.listdir(person_dir):   
+                
                 image_path = person_dir+"/"+photo
+                print(image_path)
                 image = cv2.imread(image_path)
                 image_h, image_w, _ = image.shape
                 new_image = preprocess_input(image, net_h, net_w)
