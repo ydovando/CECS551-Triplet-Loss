@@ -3,14 +3,14 @@ import imageFinder
 import eval
 
 
-meanAP =0
+meanAP =26.61
+img_findr = imageFinder.ImageFinder()
 
 
-# query 1  threshold = 0.5 for all groups
+# # query 1  threshold = 0.5 for all groups
 print( "QUERY 1: -----------------------------------------------------------")
 print("Threshold 0.5")
 print()
-img_findr = imageFinder.ImageFinder()
 precision_sum = 0
 for i in range(7):
     group_id = i+1 
@@ -26,7 +26,7 @@ meanAP += (precision_sum / 7)
 print( "--------------------------------------------------------------")
 
 
-#query 2 threshold = 0.4 for all groups
+# #query 2 threshold = 0.4 for all groups
 print( "QUERY 2: -----------------------------------------------------------")
 print("Threshold 0.4")
 print()
@@ -49,7 +49,6 @@ print( "--------------------------------------------------------------")
 # query 3 threshold = 0.3 for all group 
 print( "QUERY 3: -----------------------------------------------------------")
 print("Threshold 0.3")
-Print()
 
 precision_sum = 0
 for i in range(7):
