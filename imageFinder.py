@@ -21,17 +21,28 @@ from keras_yolo_model import _main_
 import image2vec 
 
 
+import pandas as pd
+
 
 photo_dirs = os.getcwd()+"/photos"
 weights_path = os.getcwd() +"/yolov3.weights"
 
 def getImagesForGroup(x):
+
+        # ------------------------------- [ FIND TOP PC PICTURES OF GROUP MEMBERS ] ------------------------------
         group_in_query = str(x)
         # result = _main_(photo_dirs, weights_path, group_in_query)
         f = open("vectors.txt", "w")
+
+
+
+        # ---------------------------------- [GETTING ALL THE EMBEDDED VECTORS] ---------------------------
         all_embedded_vectors_dict = {}
         file_names = []
         count = 0
+
+
+
         for dir in os.listdir(photo_dirs):
 
                 data = {}
@@ -72,6 +83,17 @@ def getImagesForGroup(x):
                         f.write("\n")
                         img_count += 1
                         count += 1
+
+
+        # ---------------------------- [GETTING ALL PICS SIMILAR TO THE GROUP MEMBERS] ---------------------------------------
+        # top_pics =[]
+        # for item in top_pc_group:
+        #         image_path = item[1]
+
+        #         for embed_vector in all_embedded_vectors_dict:
+        #                 image2vec(image_path, embed_vector[])
+        df = pd.DataFrame.from_dict(all_embedded_vectors_dict , orient= 'index' , columns = ['x','y','z'])
+        df.to_csv(os.getcwd()+"/embed-vecs.csv")
         f.close()
 
 
