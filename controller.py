@@ -10,16 +10,17 @@ meanAP =0
 print( "QUERY 1: -----------------------------------------------------------")
 print("Threshold 0.5")
 print()
+img_findr = imageFinder.ImageFinder()
 precision_sum = 0
 for i in range(7):
     group_id = i+1 
-    similar_pics = imageFinder.getImagesForGroup(group_id)
+    similar_pics = img_findr.getImagesForGroup(group_id)
     evaluation = eval.Eval(similar_pics, group_id)
     precision = evaluation.precision()
-    print("Precision for query 1 and group id ", group_id, " ", precision)
+    print("Precision for query 1 and group id ", group_id, " ", precision,"%")
     precision_sum += precision
     recall = evaluation.recall()
-    print("Recall for query 1 and group id ", groupid , " " , recall)
+    print("Recall for query 1 and group id ", group_id , " " , recall,"%")
 meanAP += (precision_sum / 7)
 
 print( "--------------------------------------------------------------")
@@ -33,13 +34,13 @@ precision_sum = 0
 
 for i in range(7):
     group_id = i+1 
-    similar_pics = imageFinder.getImagesForGroup(group_id , 0.4)
+    similar_pics = img_findr.getImagesForGroup(group_id , 0.4)
     evaluation = eval.Eval(similar_pics, group_id)
     precision = evaluation.precision()
-    print("Precision for query 2 and group id ", group_id, " ", precision)
+    print("Precision for query 2 and group id ", group_id, " ", precision,"%")
     precision_sum += precision
     recall = evaluation.recall()
-    print("Recall for query 2 and group id ", groupid , " " , recall)
+    print("Recall for query 2 and group id ", group_id , " " , recall,"%")
 meanAP += (precision_sum / 7)
 print( "--------------------------------------------------------------")
 
@@ -53,20 +54,20 @@ Print()
 precision_sum = 0
 for i in range(7):
     group_id = i+1 
-    similar_pics = imageFinder.getImagesForGroup(group_id , 0.3)
+    similar_pics = img_findr.getImagesForGroup(group_id , 0.3)
     evaluation = eval.Eval(similar_pics, group_id)
 
     precision = evaluation.precision()
-    print("Precision for query 3 and group id ", group_id, " ", precision)
+    print("Precision for query 3 and group id ", group_id, " ", precision,"%")
     precision_sum += precision
 
     recall = evaluation.recall()
-    print("Recall for query 3 and group id ", groupid , " " , recall)
+    print("Recall for query 3 and group id ", group_id , " " , recall,"%")
 meanAP += (precision_sum / 7)
 
 print( "--------------------------------------------------------------")
 print()
 print()
 meanAP = meanAP / 3
-print("Mean Average Precision: " , meanAP)
+print("Mean Average Precision: " , meanAP, "%")
 
